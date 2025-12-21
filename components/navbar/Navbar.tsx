@@ -11,7 +11,7 @@ const Navbar = () => {
                     <div className='flex items-center justify-between'>
                         <Brand />
 
-                        <Button variant="outline" size="icon" className='cursor-pointer'>
+                        <Button variant="outline" size="icon" className='cursor-pointer hover:text-white'>
                             <User />
                         </Button>
                     </div>
