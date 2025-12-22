@@ -1,6 +1,7 @@
 // generate room data
-import { Room } from "@/interfaces";
-export const rooms: Room[] = [
+import { RoomStatus } from "@/enums";
+import { IRoom } from "@/interfaces";
+export const rooms: IRoom[] = [
     {
         id: "1",
         name: "Corner Shop",
@@ -8,7 +9,8 @@ export const rooms: Room[] = [
         sizeSqFt: 144,
         monthyRent: 12000,
         deposit: 12000,
-        photo: ["/images/shop1.jpg"]
+        status: RoomStatus.AVAILABLE,
+        photo: ["https://images.pexels.com/photos/803908/pexels-photo-803908.jpeg", "https://images.pexels.com/photos/3935340/pexels-photo-3935340.jpeg"]
     },
     {
         id: "2",
@@ -17,7 +19,8 @@ export const rooms: Room[] = [
         sizeSqFt: 84,
         monthyRent: 8000,
         deposit: 8000,
-        photo: ["/images/shop2.jpg"]
+        status: RoomStatus.MAINTENANCE,
+        photo: ["https://images.pexels.com/photos/271649/pexels-photo-271649.jpeg"]
     },
     {
         id: "3",
@@ -26,6 +29,7 @@ export const rooms: Room[] = [
         sizeSqFt: 144,
         monthyRent: 10000,
         deposit: 10000,
-        photo: ["/images/shop3.jpg"]
+        status: RoomStatus.AVAILABLE,
+        photo: ["https://images.pexels.com/photos/5872378/pexels-photo-5872378.jpeg", "https://images.pexels.com/photos/30747177/pexels-photo-30747177.jpeg"]
     }
 ];

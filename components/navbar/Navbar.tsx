@@ -5,7 +5,7 @@ import { User } from 'lucide-react'
 const Navbar = () => {
     return (
         <nav className="w-full">
-            <div className='py-3 border-b'>
+            <div className='p-3 border-b'>
                 <div className='flex items-center justify-between'>
                     <Brand />
 

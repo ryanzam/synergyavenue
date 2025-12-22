@@ -1,3 +1,5 @@
+import { RoomStatus } from "@/enums";
+
 export interface IRoom {
     id: string;
     name: string;
@@ -5,5 +7,6 @@ export interface IRoom {
     sizeSqFt: number;
     monthyRent: number;
     deposit: number;
+    status: RoomStatus
     photo: string[];
 }
