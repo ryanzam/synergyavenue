@@ -149,7 +149,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                         <div className="sticky top-4 space-y-6">
                             {/* Pricing Card */}
                             <Card className="border-2 border-accent/50">
-                                <CardHeader className="bg-linear-to-r from-blue-50 to-indigo-50">
+                                <CardHeader className="bg-linear-to-r from-secondary/60 to-indigo-50">
                                     <CardTitle className="text-2xl">Pricing</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pt-6 space-y-4">
@@ -207,7 +207,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                             </p>
                                             <Button
                                                 variant="outline"
-                                                className="w-full mt-3"
+                                                className="w-full mt-3 hover:text-white"
                                                 asChild
                                             >
                                                 <Link href="/">View Other Spaces</Link>

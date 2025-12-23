@@ -1,5 +1,6 @@
 import Hero from "@/components/hero/Hero";
 import RoomCard from "@/components/room/RoomCard";
+import { Button } from "@/components/ui/button";
 import { rooms } from "@/data";
 
 export default function Home() {
@@ -51,6 +52,28 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-linear-to-r from-secondary to-primary text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold">Ready to Start Your Business?</h2>
+          <p className="mt-4 text-xl text-blue-100">
+            Apply now and get a response within 48 hours
+          </p>
+          <Button size="lg" variant="default" className="mt-8 hover:bg-primary/50" asChild>
+            <a href="#available-rooms">Apply Today</a>
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-foreground/5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-primary">© 2025 Synergy Avenue. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
