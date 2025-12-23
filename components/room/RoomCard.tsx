@@ -11,20 +11,19 @@ interface RoomCardProps {
 }
 
 const RoomCard = ({ room }: RoomCardProps) => {
-    const primaryPhoto = room.photo[0] ? '/placeholder-room.jpg' : '/placeholder-room.jpg';
 
     return (
         <Card className="overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1">
             {/* Room Image */}
             <div className="relative h-56 w-full overflow-hidden bg-gray-200">
                 <Image
-                    src={primaryPhoto}
+                    src={room.photo[0]}
                     alt={room.name}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <Badge className="absolute top-4 right-4 bg-green-500">
+                <Badge className="absolute top-4 right-4 bg-green-500 text-primary">
                     Available
                 </Badge>
             </div>

@@ -17,7 +17,7 @@ const Hero = () => {
                     </p>
                     <div className="mt-10 flex flex-wrap gap-4">
                         <Button size="lg" variant="default" asChild className='hover:bg-primary/10'>
-                            <a href="#available-rooms">Browse Rooms</a>
+                            <Link href="/rooms">Browse Rooms</Link>
                         </Button>
                         <Button size="lg" variant="outline" className="text-primary hover:bg-primary/10" asChild>
                             <Link href="/about">Learn More</Link>

@@ -1,9 +1,11 @@
-import React from 'react'
+import Link from 'next/link';
 
 const Brand = () => {
   return (
     <div className='cursor-pointer'>
-      <h3 className="text-2xl font-bold">Synergy<span className='text-secondary'>Avenue</span></h3>
+      <Link href='/'>
+        <h3 className="text-2xl font-bold">Synergy<span className='text-secondary'>Avenue</span></h3>
+      </Link>
     </div>
   )
 }

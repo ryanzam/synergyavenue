@@ -162,7 +162,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                     <div className="flex justify-between items-center">
                                         <span className="text-primary">Security Deposit</span>
                                         <span className="text-xl font-semibold text-primary">
-                                            ${room.deposit.toLocaleString()}
+                                            ${room.deposit}
                                         </span>
                                     </div>
 
@@ -171,7 +171,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                     <div className="flex justify-between items-center">
                                         <span className="font-semibold">Total Due at Signing</span>
                                         <span className="text-2xl font-bold text-secondary">
-                                            ${(room.monthyRent + room.deposit).toLocaleString()}
+                                            ${room.deposit}
                                         </span>
                                     </div>
 
@@ -189,7 +189,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                             <Button
                                                 size="lg"
                                                 variant="outline"
-                                                className="w-full"
+                                                className="w-full hover:text-white"
                                                 asChild
                                             >
                                                 <Link href={`/schedule-viewing/${room.id}`}>
