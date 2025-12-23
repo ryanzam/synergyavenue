@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { CheckCircle2, Upload } from 'lucide-react'
+import { CheckCircle2, Trash2, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 interface ApplicationFormProps {
     room: IRoom
@@ -17,7 +17,7 @@ interface ApplicationFormProps {
 const ApplicationForm = ({ room }: ApplicationFormProps) => {
 
     const [currentStep, setCurrentStep] = useState<number>(1);
-    const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
+    const [uploadedDocs, setUploadedDocs] = useState<File | null>(null);
 
     const totalSteps = 3;
     const progress = (currentStep / totalSteps) * 100;
@@ -35,7 +35,10 @@ const ApplicationForm = ({ room }: ApplicationFormProps) => {
     }
 
     const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.files);
+        if (e.target.files && e.target.files[0]) {
+            setUploadedDocs(e.target.files[0]);
+            toast.success('Document uploaded successfully');
+        }
     }
 
     return (<div className="max-w-3xl mx-auto">
@@ -210,39 +213,39 @@ const ApplicationForm = ({ room }: ApplicationFormProps) => {
                     </div>
                 )}
 
-                {/* Step 4: Documents & Review */}
+                {/* Step 3: Documents & Review */}
                 {currentStep === 3 && (
                     <div className="space-y-6">
                         <div>
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-secondary transition-colors">
-                                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                                <input
-                                    type="file"
-                                    multiple
-                                    className='w-full h-full'
-                                    onChange={handleUpload}
-                                >
-                                    
-                                </input>
-                            </div>
+                            <Label htmlFor='file-upload' className='flex justify-center w-full cursor-pointer border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-secondary transition-colors'>
+                                <div className="border-gray-300 rounded-lg p-8 text-center hover:border-secondary transition-colors">
+                                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                                    <p className='text-gray-400'>Click to upload file</p>
+                                    <input
+                                        id='file-upload'
+                                        type="file"
+                                        accept='application/pdf'
+                                        className='w-full h-full hidden'
+                                        onChange={handleUpload}
+                                    />
+                                </div>
+                            </Label>
 
-                            {uploadedDocs.length > 0 && (
+                            {uploadedDocs && (
                                 <div className="mt-4 space-y-2">
-                                    <p className="text-sm font-medium">Uploaded Documents ({uploadedDocs.length}):</p>
+                                    <p className="text-sm font-medium">Uploaded Documents:</p>
                                     <ul className="space-y-2">
-                                        {uploadedDocs.map((url, index) => (
-                                            <li key={index} className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                                <span className="text-sm flex-1">Document {index + 1}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setUploadedDocs(uploadedDocs.filter((_, i) => i !== index))}
-                                                    className="text-sm text-red-600 hover:text-red-800"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </li>
-                                        ))}
+                                        <li className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                            <span className="text-sm flex-1">{uploadedDocs.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setUploadedDocs(null)}
+                                                className="text-sm cursor-pointer text-red-600 hover:text-red-800"
+                                            >
+                                                <Trash2 />
+                                            </button>
+                                        </li>
                                     </ul>
                                 </div>
                             )}
@@ -265,8 +268,8 @@ const ApplicationForm = ({ room }: ApplicationFormProps) => {
                                     <span className="font-medium">${room.deposit.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Documents Uploaded:</span>
-                                    <span className="font-medium">{uploadedDocs.length}</span>
+                                    <span className="text-gray-600">Document Uploaded:</span>
+                                    <span className="font-medium">{uploadedDocs?.name}</span>
                                 </div>
                             </div>
                         </div>
