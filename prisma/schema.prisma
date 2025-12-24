@@ -1,0 +1,336 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+enum UserRole {
+  ADMIN // Property owner (John) - full access
+  TENANT // Approved tenants - limited access to their data
+  GUEST // Unauthenticated or applicants - minimal access
+}
+
+enum RoomStatus {
+  AVAILABLE // Room is ready for applications
+  PENDING // Application approved, awaiting payment/move-in
+  OCCUPIED // Currently rented
+  MAINTENANCE // Temporarily unavailable
+}
+
+enum ApplicationStatus {
+  PENDING // Submitted, awaiting review
+  APPROVED // Admin approved, invoice generated
+  REJECTED // Admin rejected
+  WITHDRAWN // Applicant withdrew application
+}
+
+enum InvoiceStatus {
+  DRAFT // Created but not sent
+  SENT // Sent to tenant
+  PAID // Payment received
+  OVERDUE // Past due date
+  VOID // Cancelled
+}
+
+enum LogisticsEventType {
+  VIEWING // Scheduled room viewing
+  MOVE_IN // Move-in appointment
+  MOVE_OUT // Move-out appointment
+  MAINTENANCE // Maintenance request/appointment
+}
+
+enum LogisticsEventStatus {
+  SCHEDULED // Event scheduled
+  CONFIRMED // Confirmed by both parties
+  COMPLETED // Event completed
+  CANCELLED // Event cancelled
+}
+
+enum LegalDocumentType {
+  RENTAL_AGREEMENT // Main rental contract
+  ADDENDUM // Additional terms/amendments
+  TERMINATION // Lease termination agreement
+}
+
+enum NotificationType {
+  APPLICATION_SUBMITTED
+  APPLICATION_APPROVED
+  APPLICATION_REJECTED
+  INVOICE_GENERATED
+  PAYMENT_RECEIVED
+  CONTRACT_READY
+  CONTRACT_SIGNED
+  EVENT_SCHEDULED
+  EVENT_REMINDER
+  MAINTENANCE_REQUEST
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model User {
+  // Personal Info
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  name        String
+  phone       String
+  homeAddress String
+  role        UserRole @default(GUEST)
+
+  // Business info
+  businessName String?
+  businessType String?
+
+  emailVerified Boolean @default(false)
+
+  accounts Account[]
+  sessions Session[]
+
+  // Relations
+  applications          Application[]    @relation("Applicant")
+  reviewedApplications  Application[]    @relation("Reviewer")
+  currentRoom           Room?            @relation("CurrentTenant")
+  invoices              Invoice[]
+  logisticsEvents       LogisticsEvent[]
+  legalDocuments        LegalDocument[]
+  sentNotifications     Notification[]   @relation("Sender")
+  receivedNotifications Notification[]   @relation("Recipient")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+/// Room model - represents the 5 rentable shop spaces
+model Room {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String // e.g., "Room 1", "Shop A"
+  description String // Detailed description
+  sizeSqFt    Int // Size in square feet
+  monthlyRent Float // Monthly rent amount
+  deposit     Float // Security deposit amount
+  photos      String[] // Array of image URLs
+  status      RoomStatus @default(AVAILABLE)
+
+  // Current tenant relation (optional)
+  currentTenantId String? @unique @db.ObjectId
+  currentTenant   User?   @relation("CurrentTenant", fields: [currentTenantId], references: [id])
+
+  // Relations
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@map("rooms")
+}
+
+/// Application model - tenant applications for rooms
+model Application {
+  id     String            @id @default(auto()) @map("_id") @db.ObjectId
+  status ApplicationStatus @default(PENDING)
+
+  // Applicant information
+  applicantId String @db.ObjectId
+  applicant   User   @relation("Applicant", fields: [applicantId], references: [id], onDelete: Cascade)
+
+  // Room information
+  roomId String @db.ObjectId
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  // Application details
+  businessPlan   String // Detailed business plan
+  supportingDocs String[] // URLs to uploaded documents (business license, ID, etc.)
+  expectedMoveIn DateTime // Desired move-in date
+
+  // Review information
+  reviewedAt   DateTime?
+  reviewedById String?   @db.ObjectId
+  reviewedBy   User?     @relation("Reviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewNotes  String? // Admin notes on approval/rejection
+
+  // Relations
+  invoices        Invoice[]
+  logisticsEvents LogisticsEvent[]
+  legalDocuments  LegalDocument[]
+
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([applicantId])
+  @@index([roomId])
+  @@map("applications")
+}
+
+/// Invoice model - billing and payments
+model Invoice {
+  id       String        @id @default(auto()) @map("_id") @db.ObjectId
+  status   InvoiceStatus @default(DRAFT)
+  amount   Float
+  currency String        @default("USD")
+
+  // Stripe integration
+  stripeInvoiceId       String? @unique
+  stripePaymentIntentId String? @unique
+
+  // Relations
+  applicationId String?      @db.ObjectId
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  tenantId String @db.ObjectId
+  tenant   User   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Invoice details
+  items Json // Array of {description: string, amount: number, quantity: number}
+  notes String?
+
+  // Dates
+  dueDate   DateTime
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([status])
+  @@index([tenantId])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+/// LogisticsEvent model - viewings, move-ins, maintenance
+model LogisticsEvent {
+  id     String               @id @default(auto()) @map("_id") @db.ObjectId
+  type   LogisticsEventType
+  status LogisticsEventStatus @default(SCHEDULED)
+
+  // Relations (either application or tenant)
+  applicationId String?      @db.ObjectId
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  tenantId String? @db.ObjectId
+  tenant   User?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Event details
+  title       String
+  description String?
+  notes       String?
+
+  // Scheduling
+  scheduledAt DateTime
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("logistics_events")
+}
+
+/// LegalDocument model - contracts and agreements
+model LegalDocument {
+  id   String            @id @default(auto()) @map("_id") @db.ObjectId
+  type LegalDocumentType
+
+  // Relations
+  applicationId String?      @db.ObjectId
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  tenantId String @db.ObjectId
+  tenant   User   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Document details
+  templateVersion String // e.g., "v1.0" for tracking template changes
+  content         Json // Contract data (tenant info, room details, terms)
+  pdfUrl          String? // URL to generated PDF
+
+  // E-signature tracking (DocuSign)
+  docuSignEnvelopeId String?   @unique
+  signedByTenantAt   DateTime?
+  signedByAdminAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([tenantId])
+  @@map("legal_documents")
+}
+
+/// Notification model - email and in-app notifications
+model Notification {
+  id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  type    NotificationType
+  title   String
+  message String
+  read    Boolean          @default(false)
+
+  // Relations
+  recipientId String @db.ObjectId
+  recipient   User   @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  senderId String? @db.ObjectId
+  sender   User?   @relation("Sender", fields: [senderId], references: [id], onDelete: SetNull)
+
+  // Metadata
+  metadata Json? // Additional context (applicationId, invoiceId, etc.)
+
+  // Email tracking
+  emailSent Boolean   @default(false)
+  sentAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId, read])
+  @@index([type])
+  @@map("notifications")
+}
+
+// ============================================================================
+// AUTH MODELS - for NextAuth.js
+// ============================================================================
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
