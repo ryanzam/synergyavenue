@@ -90,6 +90,7 @@ model User {
   name        String
   phone       String
   homeAddress String
+  password    String
   role        UserRole @default(GUEST)
 
   // Business info

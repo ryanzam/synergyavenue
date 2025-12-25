@@ -1,7 +1,8 @@
-import z, { success } from "zod";
+"use server"
+
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { id } from "zod/v4/locales";
 import { auth, signIn, signOut } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
@@ -29,8 +30,16 @@ const updateProfileSchema = z.object({
 
 
 // server actions
-export async function registerUser(data: z.infer<typeof registerSchema>) {
+export async function registerUser(prevState: any, formData: FormData) {
     try {
+        const data = {
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
+            phone: formData.get('phone') as string,
+            homeAddress: formData.get('homeAddress') as string,
+            password: formData.get('password') as string,
+        };
+
         const validateData = registerSchema.parse(data);
 
         const existingUser = await prisma.user.findUnique({
@@ -44,7 +53,7 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
             }
         }
 
-        //const hashedPassword = await bcrypt.hash(validateData.password, 10);
+        const hashedPassword = await bcrypt.hash(validateData.password, 10);
 
         const user = await prisma.user.create({
             data: {
@@ -52,6 +61,7 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
                 phone: validateData.phone,
                 email: validateData.email,
                 homeAddress: validateData.homeAddress,
+                password: hashedPassword,
                 role: 'GUEST',
             }
         });
