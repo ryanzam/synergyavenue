@@ -16,7 +16,7 @@ const RegisterPage = () => {
           {/* Left Side - Benefits */}
           <div className="hidden lg:block text-white">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-lg mb-6">
-              <Building2 className="h-8 w-8 text-purple-600" />
+              <Building2 className="h-8 w-8 text-primary" />
             </div>
             <h1 className="text-4xl font-bold mb-4">Join SynergyAvenue</h1>
             <p className="text-purple-100 text-lg mb-8">
