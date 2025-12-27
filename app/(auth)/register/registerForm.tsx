@@ -1,11 +1,12 @@
-"use client"
-
+import { registerUser } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import { User, Mail, Phone, Lock, Home, Loader2 } from 'lucide-react'
-import React, { useActionState, useState } from 'react'
-import { useFormStatus } from 'react-dom'
+import { User, Mail, Phone, Lock, Home, Loader2, Info } from 'lucide-react'
+import React, { useActionState, useEffect, useState } from 'react'
+import { useFormStatus, } from 'react-dom'
+import { redirect } from 'next/navigation';
+import { toast } from 'sonner'
 
 const SubmitButton = () => {
     const { pending } = useFormStatus();
@@ -29,14 +30,17 @@ const SubmitButton = () => {
     );
 }
 
-const registerUser = () => {
-
-}
-
 const RegisterForm = () => {
 
     const [password, setPassword] = useState('')
     const [state, formAction] = useActionState(registerUser, null);
+
+    useEffect(() => {
+        if (state?.success) {
+            toast.success("Account created! 🎉");
+            redirect("/login")
+        }
+    })
 
     const getPasswordStrength = (pass: string) => {
         if (pass.length === 0) return { strength: 0, label: '', color: '' };
@@ -50,6 +54,8 @@ const RegisterForm = () => {
 
     return (
         <form action={formAction} className="space-y-4">
+            {!state?.success && (<span className='text-red-600 flex items-center gap-2 font-medium'>{state?.error}</span>)}
+
             {/* Name Field */}
             <div>
                 <Label className='text-[14px] font-medium text-primary' htmlFor="name">Full name</Label>
@@ -94,6 +100,7 @@ const RegisterForm = () => {
                         name="phone"
                         type="tel"
                         required
+                        min={10}
                         placeholder="+977 987654321"
                         className="pl-10"
                         autoComplete="tel"

@@ -1,7 +1,7 @@
 "use server"
 
-import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { success, z } from "zod";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { auth, signIn, signOut } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -9,8 +9,8 @@ import { revalidatePath } from "next/cache";
 // schemas for auth actions
 const registerSchema = z.object({
     name: z.string().min(3, 'Name is required'),
-    phone: z.string().min(10, 'Phone number is required'),
     email: z.string().email('Invalid email'),
+    phone: z.string().min(10, 'Phone number is required'),
     homeAddress: z.string().min(5, 'Home address is required'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
 });
@@ -27,7 +27,6 @@ const updateProfileSchema = z.object({
     businessType: z.string().optional(),
     avatarUrl: z.string().url().optional(),
 });
-
 
 // server actions
 export async function registerUser(prevState: any, formData: FormData) {
@@ -68,15 +67,8 @@ export async function registerUser(prevState: any, formData: FormData) {
 
         return {
             success: true,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
             message: "Registration successful. Please log in.",
         }
-
     }
     catch (error) {
         console.error('Registration error:', error);
@@ -222,7 +214,6 @@ export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
                 phone: true,
                 businessName: true,
                 businessType: true,
-                avatarUrl: true,
             },
         });
 

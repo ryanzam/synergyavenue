@@ -1,8 +1,8 @@
 import NextAuth, { type DefaultSession } from 'next-auth';
-import { prisma } from './prisma'
+import prisma from './prisma'
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
-
+import bcrypt from "bcryptjs";
 declare module 'next-auth' {
     interface Session {
         user: {
@@ -13,7 +13,7 @@ declare module 'next-auth' {
 }
 
 export const {
-    handlers: { GET, POST },
+    handlers,
     auth,
     signIn,
     signOut,
@@ -42,30 +42,17 @@ export const {
                     where: { email: credentials.email as string },
                 });
 
-                if (!user) {
-                    return null;
-                }
+                if (!user || !user.password) return null;
 
-                // In production, you'd verify password hash here
-                // const isPasswordValid = await bcrypt.compare(
-                //   credentials.password as string,
-                //   user.passwordHash
-                // );
+                const isValid = await bcrypt.compare(credentials.password, user.password);
 
-                // For demo purposes, accepting any password
-                // Remove this in production!
-                const isPasswordValid = true;
-
-                if (!isPasswordValid) {
-                    return null;
-                }
+                if (!isValid) return null;
 
                 return {
                     id: user.id,
                     email: user.email,
                     name: user.name,
                     role: user.role,
-                    image: user.avatarUrl,
                 };
             },
         }),
