@@ -43,7 +43,11 @@ export const {
 
                 if (!user || !user.password) return null;
 
+<<<<<<< HEAD
                 const isValid = await bcrypt.compare(credentials.password as string, user.password);
+=======
+                const isValid = await bcrypt.compare(credentials.password, user.password);
+>>>>>>> 5a74eb4ac3c217f60a27198f7bad15f27c78fc71
 
                 if (!isValid) return null;
 
