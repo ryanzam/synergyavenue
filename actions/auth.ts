@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { auth, signIn, signOut } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 // schemas for auth actions
 const registerSchema = z.object({
@@ -87,8 +88,13 @@ export async function registerUser(prevState: any, formData: FormData) {
     }
 }
 
-export async function loginUser(data: z.infer<typeof loginSchema>) {
+export async function loginUser(prevState: any, formData: FormData) {
     try {
+        const data = {
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
+        };
+
         const validateData = loginSchema.parse(data);
 
         const result = await signIn('credentials', {
@@ -114,7 +120,7 @@ export async function loginUser(data: z.infer<typeof loginSchema>) {
         if (error instanceof z.ZodError) {
             return {
                 success: false,
-                error: "Validation failed"
+                error: "Invalid email or password."
             }
         }
 

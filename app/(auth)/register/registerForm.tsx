@@ -5,7 +5,7 @@ import { Label } from '@radix-ui/react-label'
 import { User, Mail, Phone, Lock, Home, Loader2, Info } from 'lucide-react'
 import React, { useActionState, useEffect, useState } from 'react'
 import { useFormStatus, } from 'react-dom'
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner'
 
 const SubmitButton = () => {
@@ -31,6 +31,7 @@ const SubmitButton = () => {
 }
 
 const RegisterForm = () => {
+    const router = useRouter();
 
     const [password, setPassword] = useState('')
     const [state, formAction] = useActionState(registerUser, null);
@@ -38,9 +39,9 @@ const RegisterForm = () => {
     useEffect(() => {
         if (state?.success) {
             toast.success("Account created! 🎉");
-            redirect("/login")
+            router.push("/login")
         }
-    })
+    }, [state?.success])
 
     const getPasswordStrength = (pass: string) => {
         if (pass.length === 0) return { strength: 0, label: '', color: '' };
@@ -100,8 +101,8 @@ const RegisterForm = () => {
                         name="phone"
                         type="tel"
                         required
-                        min={10}
-                        placeholder="+977 987654321"
+                        pattern='[0-9]{10}'
+                        placeholder="9876543210"
                         className="pl-10"
                         autoComplete="tel"
                     />

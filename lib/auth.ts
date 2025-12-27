@@ -24,7 +24,6 @@ export const {
     },
     pages: {
         signIn: '/login',
-        error: '/login',
     },
     providers: [
         CredentialsProvider({
@@ -44,7 +43,7 @@ export const {
 
                 if (!user || !user.password) return null;
 
-                const isValid = await bcrypt.compare(credentials.password, user.password);
+                const isValid = await bcrypt.compare(credentials.password as string, user.password);
 
                 if (!isValid) return null;
 
@@ -73,6 +72,7 @@ export const {
             return session;
         },
     },
+    secret: process.env.AUTH_SECRET
 });
 
 /**

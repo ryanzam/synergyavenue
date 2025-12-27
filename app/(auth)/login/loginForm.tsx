@@ -1,12 +1,15 @@
 "use client"
 
+import { loginUser } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
-import React, { useActionState } from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom';
+import { toast } from 'sonner';
 
 const SubmitButton = () => {
     const { pending } = useFormStatus();
@@ -30,16 +33,24 @@ const SubmitButton = () => {
     );
 }
 
-const loginUser = () => {
-
-}
-
 const loginForm = () => {
+    const router = useRouter();
 
     const [state, formAction] = useActionState(loginUser, null);
 
+    useEffect(() => {
+        if (state?.success) {
+            toast.success('Welcome back! 👋')
+            router.push('/dashboard');
+        }
+    }, [state?.success, router])
+
+    console.log({ state })
+
     return (
         <form action={formAction} className="space-y-4">
+            {!state?.success && (<span className='text-red-600 flex items-center gap-2 font-medium'>{state?.error}</span>)}
+
             {/* Email Field */}
             <div>
                 <Label className='text-[14px] font-medium text-primary' htmlFor="email">Email address</Label>
