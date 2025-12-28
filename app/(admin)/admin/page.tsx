@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { applications, rooms } from '@/data'
-import { ArrowRight, Badge, Bell, Building2, DollarSign, FileText, Plus, Settings, Users } from 'lucide-react'
+import { applications, rooms, users } from '@/data'
+import { ArrowRight, Bell, Building2, DollarSign, FileText, Plus, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+import { Badge } from '@/components/ui/badge'
 
 const stats = {
     totalRooms: rooms.length,
@@ -207,6 +208,46 @@ const AdminPage = () => {
                                 {applications.length === 0 && (
                                     <p className="text-center text-gray-500 py-8">No applications yet</p>
                                 )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Recent Users */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>Recent Users</CardTitle>
+                                    <CardDescription>Newly registered users</CardDescription>
+                                </div>
+                                <Button variant="ghost" className='hover:text-white' size="sm" asChild>
+                                    <Link href="/admin/users">
+                                        View all
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {users.map((u) => (
+                                    <div
+                                        key={u.id}
+                                        className="flex items-center justify-between p-3 border rounded-lg"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                                <Users className="h-5 w-5 text-gray-600" />
+                                            </div>
+                                            <div>
+                                                <div className="font-medium">{u.name}</div>
+                                                <div className="text-sm text-gray-500">{u.email}</div>
+                                            </div>
+                                        </div>
+                                        {/* use user role */}
+                                        <Badge variant="outline">{u.name}</Badge>
+                                    </div>
+                                ))}
                             </div>
                         </CardContent>
                     </Card>
