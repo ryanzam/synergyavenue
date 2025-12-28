@@ -1,7 +1,18 @@
 import { Button } from '@/components/ui/button'
-import { Bell, Building2, Settings } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { rooms } from '@/data'
+import { Bell, Building2, DollarSign, FileText, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+
+const stats = {
+    totalRooms: rooms.length,
+    availableRooms: rooms.filter(r => r.status === 'AVAILABLE').length,
+    occupiedRooms: rooms.filter(r => r.status === 'OCCUPIED').length,
+    pendingApplications: 1,
+    totalRevenue: 0,
+    monthlyRevenue: 0
+}
 
 const AdminPage = () => {
     return (
@@ -40,6 +51,69 @@ const AdminPage = () => {
                     </div>
                 </div>
             </header>
+
+            <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                    <Card className="border-l-4 border-l-blue-600">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Total Rooms
+                            </CardTitle>
+                            <Building2 className="h-5 w-5 text-blue-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold">{stats.totalRooms}</div>
+                            <p className="text-sm text-gray-500 mt-1">
+                                {stats.availableRooms} available
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-yellow-600">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Pending Applications
+                            </CardTitle>
+                            <FileText className="h-5 w-5 text-yellow-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold">{stats.pendingApplications}</div>
+                            <p className="text-sm text-gray-500 mt-1">Awaiting review</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-green-600">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Occupied Rooms
+                            </CardTitle>
+                            <Users className="h-5 w-5 text-green-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold">{stats.occupiedRooms}</div>
+                            <p className="text-sm text-gray-500 mt-1">
+                                {Math.round((stats.occupiedRooms / stats.totalRooms) * 100)}% occupancy
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-l-4 border-l-purple-600">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-600">
+                                Monthly Revenue
+                            </CardTitle>
+                            <DollarSign className="h-5 w-5 text-purple-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-3xl font-bold">
+                                ${stats.monthlyRevenue.toLocaleString()}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">This month</p>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     )
 }
