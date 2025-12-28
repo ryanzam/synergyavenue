@@ -1,6 +1,7 @@
-// generate room data
 import { RoomStatus } from "@/enums";
-import { IRoom } from "@/interfaces";
+import { IApplication, IRoom, IUser } from "@/interfaces";
+
+//mock data 
 export const rooms: IRoom[] = [
     {
         id: "1",
@@ -33,3 +34,35 @@ export const rooms: IRoom[] = [
         photo: ["https://images.pexels.com/photos/5872378/pexels-photo-5872378.jpeg", "https://images.pexels.com/photos/30747177/pexels-photo-30747177.jpeg"]
     }
 ];
+
+export const users: IUser[] = [
+    {
+        id: "1",
+        name: "John Doe",
+        email: "john@doe.com"
+    },
+    {
+        id: "2",
+        name: "Tome Colson",
+        email: "tome@col.com"
+    }
+]
+
+export const applications: IApplication[] = [
+    {
+        id: "1",
+        applicant: { id: "1", name: "John Doe", email: "john@doe.com" },
+        room: {
+            id: "2",
+            name: "Main Street Store",
+            description: "Located on the main street with excellent visibility.",
+            sizeSqFt: 84,
+            monthyRent: 8000,
+            deposit: 8000,
+            status: RoomStatus.MAINTENANCE,
+            photo: ["https://images.pexels.com/photos/271649/pexels-photo-271649.jpeg"]
+        },
+        status: "PENDING",
+        submittedAt: new Date().toString()
+    }
+]
