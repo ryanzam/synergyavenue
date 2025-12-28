@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { rooms } from '@/data'
-import { Bell, Building2, DollarSign, FileText, Settings, Users } from 'lucide-react'
+import { Bell, Building2, DollarSign, FileText, Plus, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
@@ -113,6 +113,47 @@ const AdminPage = () => {
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Quick Actions */}
+                <Card className="mb-8 bg-linear-to-r from-primary/80 to-default text-white">
+                    <CardHeader>
+                        <CardTitle>Quick Actions</CardTitle>
+                        <CardDescription className="text-blue-100">
+                            Common administrative tasks
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <Button variant="default" className="w-full" asChild>
+                                <Link href="/admin/rooms/new">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Room
+                                </Link>
+                            </Button>
+
+                            <Button variant="default" className="w-full" asChild>
+                                <Link href="/admin/applications">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    Review Applications
+                                </Link>
+                            </Button>
+
+                            <Button variant="default" className="w-full" asChild>
+                                <Link href="/admin/invoices">
+                                    <DollarSign className="mr-2 h-4 w-4" />
+                                    Manage Invoices
+                                </Link>
+                            </Button>
+
+                            <Button variant="default" className="w-full" asChild>
+                                <Link href="/admin/users">
+                                    <Users className="mr-2 h-4 w-4" />
+                                    Manage Users
+                                </Link>
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
