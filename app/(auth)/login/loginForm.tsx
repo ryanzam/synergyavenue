@@ -45,8 +45,6 @@ const loginForm = () => {
         }
     }, [state?.success, router])
 
-    console.log({ state })
-
     return (
         <form action={formAction} className="space-y-4">
             {!state?.success && (<span className='text-red-600 flex items-center gap-2 font-medium'>{state?.error}</span>)}

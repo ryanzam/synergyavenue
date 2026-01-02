@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { applications, rooms, users } from '@/data'
-import { ArrowRight, Bell, Building2, DollarSign, FileText, Plus, Settings, Users } from 'lucide-react'
+import { ArrowRight, Bell, Building2, DollarSign, FileText, Plus, Settings, TrendingUp, Users } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +14,8 @@ const stats = {
     totalRevenue: 0,
     monthlyRevenue: 0
 }
+
+const invoices = []
 
 const AdminPage = () => {
     return (
@@ -248,6 +250,50 @@ const AdminPage = () => {
                                         <Badge variant="outline">{u.name}</Badge>
                                     </div>
                                 ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Revenue Overview */}
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>Revenue Overview</CardTitle>
+                                    <CardDescription>Total revenue from paid invoices</CardDescription>
+                                </div>
+                                <TrendingUp className="h-5 w-5 text-green-600" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div className="flex items-baseline gap-2">
+                                    <div className="text-4xl font-bold text-gray-900">
+                                        ${stats.totalRevenue.toLocaleString()}
+                                    </div>
+                                    <div className="text-sm text-gray-500">total revenue</div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
+                                    <div>
+                                        <div className="text-sm text-gray-600">This Month</div>
+                                        <div className="text-2xl font-bold text-green-600">
+                                            ${stats.monthlyRevenue.toLocaleString()}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-600">Paid Invoices</div>
+                                        <div className="text-2xl font-bold text-blue-600">
+                                            {invoices.length}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-sm text-gray-600">Avg per Invoice</div>
+                                        <div className="text-2xl font-bold text-purple-600">
+                                            ${invoices.length > 0 ? Math.round(stats.totalRevenue / invoices.length).toLocaleString() : 0}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
