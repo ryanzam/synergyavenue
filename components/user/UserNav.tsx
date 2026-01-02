@@ -3,11 +3,19 @@
 import { logoutUser } from '@/actions/auth'
 import { auth } from '@/lib/auth'
 import { User2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import { toast } from 'sonner'
 
 const UserNav = ({ name }: { name: string }) => {
 
-    const [showMenu, setShowMenu] = useState(false)
+    const router = useRouter();
+
+    const handleSignOut = async () => {
+        await logoutUser()
+        toast.success("Logged out successfully!")
+        router.push('/');
+    }
 
     return (
         <div className="mb-8 flex justify-between items-center">
@@ -38,7 +46,7 @@ const UserNav = ({ name }: { name: string }) => {
                         <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition" role="menuitem">Settings</a>
                         <div className="border-t border-gray-200"></div>
 
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition" role="menuitem" onClick={logoutUser}>Sign out</a>
+                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition" role="menuitem" onClick={handleSignOut}>Sign out</a>
                     </div>
                 </div>
 
