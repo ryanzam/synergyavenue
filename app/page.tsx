@@ -1,4 +1,5 @@
 import Hero from "@/components/hero/Hero";
+import Navbar from "@/components/navbar/Navbar";
 import RoomCard from "@/components/room/RoomCard";
 import { Button } from "@/components/ui/button";
 import { rooms } from "@/data";
@@ -6,6 +7,8 @@ import { rooms } from "@/data";
 export default function Home() {
   return (
     <div className="min-h-screen dark:bg-black">
+      <Navbar />
+
       <Hero />
 
       {/* Stats Section */}
