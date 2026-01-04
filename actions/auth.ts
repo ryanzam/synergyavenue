@@ -1,11 +1,10 @@
 "use server"
 
-import { success, z } from "zod";
+import { z } from "zod";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { auth, signIn, signOut } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 // schemas for auth actions
 const registerSchema = z.object({
