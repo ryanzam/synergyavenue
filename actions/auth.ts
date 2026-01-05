@@ -148,51 +148,6 @@ export async function logoutUser() {
     }
 }
 
-export async function getCurrentSession() {
-    try {
-        const session = await auth();
-
-        if (!session?.user.email) {
-            return {
-                success: false,
-                error: "Not authenticated."
-            }
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                phone: true,
-                role: true,
-                businessName: true,
-                businessType: true,
-                createdAt: true,
-            }
-        });
-
-        if (!user) {
-            return {
-                success: false,
-                error: "User not found."
-            }
-        }
-
-        return {
-            success: true,
-            user,
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to get session'
-        }
-    }
-}
-
 export async function updateProfile(data: z.infer<typeof updateProfileSchema>) {
     try {
         // 1. Get current user
@@ -404,4 +359,66 @@ export async function getAllUsers(filters?: {
             error: 'Failed to get users',
         };
     }
+}
+
+export async function getCurrentSession() {
+    try {
+        const session = await auth();
+
+        if (!session?.user.email) {
+            return {
+                success: false,
+                error: "Not authenticated."
+            }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                role: true,
+                businessName: true,
+                businessType: true,
+                createdAt: true,
+            }
+        });
+
+        if (!user) {
+            return {
+                success: false,
+                error: "User not found."
+            }
+        }
+
+        return {
+            success: true,
+            user,
+        }
+
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to get session'
+        }
+    }
+}
+
+export async function getCurrentUser() {
+    const session = await auth();
+    if (!session?.user?.email) {
+        throw new Error('Unauthorized');
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+    });
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    return user;
 }

@@ -53,7 +53,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
             toast.success(room ? 'Room updated successfully' : 'Room created successfully')
             router.push('/admin/rooms');
         } else if (state?.error) {
-            toast.error("Error adding/updating room.")
+            toast.error("Error saving room.")
         }
     }, [state, router, toast, room]);
 
@@ -63,8 +63,6 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
 
         setUploading(true);
 
-        // Simulate upload - in real app, use Uploadthing
-        // For now, create object URLs
         const newPhotos = Array.from(files).map(file => URL.createObjectURL(file));
         setPhotos(prev => [...prev, ...newPhotos]);
 

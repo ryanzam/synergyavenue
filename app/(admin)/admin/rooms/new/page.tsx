@@ -1,26 +1,20 @@
+import { getCurrentSession } from '@/actions/auth';
 import RoomForm from '@/components/room/room-form';
 import { Button } from '@/components/ui/button';
-import { auth } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 import { Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import React from 'react'
 
 const AdminRoomNewPage = async () => {
 
-    const session = await auth();
+    const session = await getCurrentSession()
 
-    if (!session?.user?.email) {
-        redirect('/login');
+    if (!session.user?.email) {
+        redirect("/dashboard")
     }
 
-    const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-    });
-
-    if (!user || user.role !== 'ADMIN') {
-        redirect('/dashboard');
+    if (session.user?.role !== 'ADMIN') {
+        redirect("/dashboard")
     }
 
     return (

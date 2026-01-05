@@ -5,9 +5,10 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Badge } from '../ui/badge';
+import { Room } from '@prisma/client';
 
 interface RoomCardProps {
-    room: IRoom
+    room: Room
 }
 
 const RoomCard = ({ room }: RoomCardProps) => {
@@ -17,7 +18,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             {/* Room Image */}
             <div className="relative h-56 w-full overflow-hidden bg-gray-200">
                 <Image
-                    src={room.photo[0]}
+                    src={room.photos.length === 0 ? '/placeholder-room.jpg' : room.photos[0]}
                     alt={room.name}
                     fill
                     className="object-cover"
@@ -53,7 +54,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
                         NPR
                     </span>
                     <span className="text-3xl font-bold text-primary">
-                        {room.monthyRent}
+                        {room.monthlyRent}
                     </span>
                     <span className="text-primary">/month</span>
                 </div>

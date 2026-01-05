@@ -3,8 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { applications, rooms, users } from '@/data'
 import { ArrowRight, Bell, Building2, DollarSign, FileText, Plus, Settings, TrendingUp, Users } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
 import { Badge } from '@/components/ui/badge'
+import { requireAdmin } from '@/lib/auth'
 
 const stats = {
     totalRooms: rooms.length,
@@ -17,7 +17,10 @@ const stats = {
 
 const invoices = []
 
-const AdminPage = () => {
+const AdminPage = async () => {
+
+    const session = await requireAdmin()
+
     return (
         <div className='min-h-screen bg-gray-50'>
             {/* Header */}

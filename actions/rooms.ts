@@ -1,7 +1,7 @@
 import z from "zod";
-import { getCurrentUser, requireAdmin } from "./users";
 import prisma from "@/lib/prisma";
 import { RoomStatus } from "@/enums";
+import { requireAdmin } from "@/lib/auth";
 
 const roomSchema = z.object({
     name: z.string().min(2, 'Room name must be at least 2 characters'),
@@ -30,8 +30,7 @@ type CreateData = { name: string; description: string; sizeSqFt: number; monthly
 
 export async function createRoom(data: CreateData) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin()
 
         const validatedData = roomSchema.parse(data);
 
@@ -73,8 +72,7 @@ export async function createRoom(data: CreateData) {
 
 export async function updateRoom(data: UpdateData) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin();
 
         const validatedData = updateRoomSchema.parse(data);
         const { id, ...updateData } = validatedData;
@@ -120,8 +118,7 @@ export async function updateRoom(data: UpdateData) {
 
 export async function deleteRoom(roomId: string) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin();
 
         const room = await prisma.room.findUnique({
             where: { id: roomId },
@@ -280,8 +277,7 @@ export async function updateRoomStatus(
     status: 'AVAILABLE' | 'PENDING' | 'OCCUPIED' | 'MAINTENANCE'
 ) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin();
 
         const room = await prisma.room.update({
             where: { id: roomId },
@@ -305,8 +301,7 @@ export async function updateRoomStatus(
 
 export async function addRoomPhotos(roomId: string, photoUrls: string[]) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin();
 
         const room = await prisma.room.findUnique({
             where: { id: roomId },
@@ -343,8 +338,7 @@ export async function addRoomPhotos(roomId: string, photoUrls: string[]) {
 
 export async function removeRoomPhoto(roomId: string, photoUrl: string) {
     try {
-        const user = await getCurrentUser();
-        requireAdmin(user);
+        await requireAdmin();
 
         const room = await prisma.room.findUnique({
             where: { id: roomId },

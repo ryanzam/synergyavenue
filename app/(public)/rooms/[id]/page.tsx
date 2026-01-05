@@ -5,16 +5,19 @@ import Link from 'next/link'
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { rooms } from '@/data'
-import { IRoom } from '@/interfaces'
 import Image from 'next/image'
+import { getRoom } from '@/actions/rooms'
+import Loading from '@/components/loading/Loading'
 
 const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) => {
 
     const { id } = await params;
 
-    const room: IRoom = rooms.filter(r => r.id === id)[0];
-    const isAvailable = room.status === "AVAILABLE";
+    const { success, room } = await getRoom(id);
+
+    if (!success && !room) return <Loading />
+
+    const isAvailable = room?.status === "AVAILABLE";
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -37,14 +40,14 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                         {/* Photo Carousel */}
                         <Carousel className="w-full" opts={{ loop: true }}>
                             <CarouselContent>
-                                {room.photo.map((p, index) => (
+                                {room?.photos.map((p, index) => (
                                     <CarouselItem key={index}>
                                         <div className="p-1">
                                             <Card>
                                                 <CardContent className="flex aspect-square items-center justify-center p-6">
                                                     <Image
                                                         src={p}
-                                                        alt={room.name}
+                                                        alt={room?.name}
                                                         fill
                                                     />
                                                 </CardContent>
@@ -60,7 +63,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                             <CardHeader>
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <CardTitle className="text-3xl text-primary">{room.name}</CardTitle>
+                                        <CardTitle className="text-3xl text-primary">{room?.name}</CardTitle>
                                         <CardDescription className="mt-2 text-base">
                                             Premium shop space in prime location
                                         </CardDescription>
@@ -69,12 +72,12 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                         className={
                                             isAvailable
                                                 ? 'bg-green-500'
-                                                : room.status === 'OCCUPIED'
+                                                : room?.status === 'OCCUPIED'
                                                     ? 'bg-red-500'
                                                     : 'bg-yellow-500'
                                         }
                                     >
-                                        {room.status}
+                                        {room?.status}
                                     </Badge>
                                 </div>
                             </CardHeader>
@@ -84,7 +87,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                 <div>
                                     <h3 className="text-lg font-semibold mb-2 text-primary">Description</h3>
                                     <p className="text-primary leading-relaxed">
-                                        {room.description}
+                                        {room?.description}
                                     </p>
                                 </div>
 
@@ -98,7 +101,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                         </div>
                                         <div>
                                             <div className="text-sm text-gray-500">Size</div>
-                                            <div className="font-semibold">{room.sizeSqFt} sq ft</div>
+                                            <div className="font-semibold">{room?.sizeSqFt} sq ft</div>
                                         </div>
                                     </div>
 
@@ -108,7 +111,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                         </div>
                                         <div>
                                             <div className="text-sm text-gray-500">Monthly Rent</div>
-                                            <div className="font-semibold">{room.monthyRent}</div>
+                                            <div className="font-semibold">{room?.monthlyRent}</div>
                                         </div>
                                     </div>
 
@@ -118,7 +121,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                         </div>
                                         <div>
                                             <div className="text-sm text-gray-500">Deposit</div>
-                                            <div className="font-semibold">{room.deposit.toLocaleString()}</div>
+                                            <div className="font-semibold">{room?.deposit.toLocaleString()}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -156,13 +159,13 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                     <div className="flex justify-between items-center">
                                         <span className="text-primary">Monthly Rent</span>
                                         <span className="text-2xl font-bold text-primary">
-                                            ${room.monthyRent}
+                                            ${room?.monthlyRent}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-primary">Security Deposit</span>
                                         <span className="text-xl font-semibold text-primary">
-                                            ${room.deposit}
+                                            ${room?.deposit}
                                         </span>
                                     </div>
 
@@ -171,7 +174,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                     <div className="flex justify-between items-center">
                                         <span className="font-semibold">Total Due at Signing</span>
                                         <span className="text-2xl font-bold text-secondary">
-                                            ${room.deposit}
+                                            ${room?.deposit}
                                         </span>
                                     </div>
 
@@ -182,7 +185,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                                 className="w-full bg-secondary hover:bg-secondary/80 mt-4"
                                                 asChild
                                             >
-                                                <Link href={`/apply/${room.id}`}>
+                                                <Link href={`/apply/${room?.id}`}>
                                                     Apply Now
                                                 </Link>
                                             </Button>
@@ -192,7 +195,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                                 className="w-full hover:text-white"
                                                 asChild
                                             >
-                                                <Link href={`/schedule-viewing/${room.id}`}>
+                                                <Link href={`/schedule-viewing/${room?.id}`}>
                                                     <Calendar className="mr-2 h-4 w-4" />
                                                     Schedule Viewing
                                                 </Link>
@@ -201,7 +204,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                     ) : (
                                         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                                             <p className="text-sm font-medium text-primary">
-                                                {room.status === 'OCCUPIED'
+                                                {room?.status === 'OCCUPIED'
                                                     ? 'This space is currently occupied'
                                                     : 'This space is not available at the moment'}
                                             </p>

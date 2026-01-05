@@ -123,8 +123,8 @@ model Room {
   name        String // e.g., "Room 1", "Shop A"
   description String // Detailed description
   sizeSqFt    Int // Size in square feet
-  monthlyRent Float // Monthly rent amount
-  deposit     Float // Security deposit amount
+  monthlyRent Int // Monthly rent amount
+  deposit     Int // Security deposit amount
   photos      String[] // Array of image URLs
   status      RoomStatus @default(AVAILABLE)
 

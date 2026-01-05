@@ -3,12 +3,17 @@ import prisma from './prisma'
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from "bcryptjs";
+import { UserRole } from '@prisma/client';
 declare module 'next-auth' {
     interface Session {
         user: {
             id: string;
-            role: 'ADMIN' | 'GUEST' | 'TENANT';
+            role: UserRole;
         } & DefaultSession['user'];
+    }
+
+    interface User {
+        role?: UserRole
     }
 }
 
@@ -51,7 +56,7 @@ export const {
                     id: user.id,
                     email: user.email,
                     name: user.name,
-                    role: user.role,
+                    role: user.role
                 };
             },
         }),
@@ -60,7 +65,7 @@ export const {
         async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
-                //token.role = user.role;
+                token.role = user.role;
             }
             return token;
         },
@@ -91,6 +96,7 @@ export async function requireAuth() {
  */
 export async function requireAdmin() {
     const session = await requireAuth();
+    console.log({ session })
     if (session.user.role !== 'ADMIN') {
         throw new Error('Admin access required');
     }

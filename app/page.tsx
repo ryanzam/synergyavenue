@@ -1,10 +1,17 @@
+import { getRooms } from "@/actions/rooms";
 import Hero from "@/components/hero/Hero";
 import Navbar from "@/components/navbar/Navbar";
 import RoomCard from "@/components/room/RoomCard";
 import { Button } from "@/components/ui/button";
-import { rooms } from "@/data";
 
-export default function Home() {
+export default async function Home() {
+
+  const { success, rooms } = await getRooms({ status: 'AVAILABLE' })
+
+  if (!success && !rooms) {
+    return <h1>Loading...</h1>
+  }
+
   return (
     <div className="min-h-screen dark:bg-black">
       <Navbar />
@@ -41,14 +48,14 @@ export default function Home() {
             </p>
           </div>
 
-          {rooms.length === 0 ? (
+          {rooms && rooms.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-xl text-gray-500">No rooms available at the moment.</p>
               <p className="mt-2 text-gray-400">Check back soon for new listings!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {rooms.map((room) => (
+              {rooms && rooms.map((room) => (
                 <RoomCard key={room.id} room={room} />
               ))}
             </div>

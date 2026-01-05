@@ -7,7 +7,6 @@ import { IUser } from '@/interfaces';
 import prisma from '@/lib/prisma';
 import { Building2, DollarSign, FileText, Users } from 'lucide-react'
 import Link from 'next/link';
-import React from 'react'
 
 const AdminDashboardPage = async ({ user }: { user: IUser }) => {
 
@@ -148,7 +147,7 @@ const AdminDashboardPage = async ({ user }: { user: IUser }) => {
                                     <p className="text-center text-gray-500 py-8">No applications yet</p>
                                 )}
                             </div>
-                            <Button variant="outline" className="w-full mt-4" asChild>
+                            <Button variant="outline" className="w-full mt-4 hover:text-white" asChild>
                                 <Link href="/admin/applications">View All Applications</Link>
                             </Button>
                         </CardContent>
@@ -187,7 +186,7 @@ const AdminDashboardPage = async ({ user }: { user: IUser }) => {
                                     </div>
                                 ))}
                             </div>
-                            <Button variant="outline" className="w-full mt-4" asChild>
+                            <Button variant="outline" className="w-full mt-4 hover:text-white" asChild>
                                 <Link href="/admin/rooms">Manage Rooms</Link>
                             </Button>
                         </CardContent>
