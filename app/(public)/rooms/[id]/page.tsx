@@ -8,6 +8,8 @@ import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
 import { getRoom } from '@/actions/rooms'
 import Loading from '@/components/loading/Loading'
+import RoomStatusBadge from '@/components/room/room-status-badge'
+import { RoomStatus } from '@/enums'
 
 const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) => {
 
@@ -66,17 +68,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                                             Premium shop space in prime location
                                         </CardDescription>
                                     </div>
-                                    <Badge
-                                        className={
-                                            isAvailable
-                                                ? 'bg-green-500'
-                                                : room?.status === 'OCCUPIED'
-                                                    ? 'bg-red-500'
-                                                    : 'bg-yellow-500'
-                                        }
-                                    >
-                                        {room?.status}
-                                    </Badge>
+                                    {room && <RoomStatusBadge status={room?.status as RoomStatus} />}
                                 </div>
                             </CardHeader>
 
