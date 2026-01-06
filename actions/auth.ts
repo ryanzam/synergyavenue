@@ -422,3 +422,37 @@ export async function getCurrentUser() {
 
     return user;
 }
+
+/**
+ * Check if user is authenticated
+ */
+export async function requireAuth() {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error('Unauthorized');
+    }
+    return session;
+}
+
+/**
+ * Check if user has admin role
+ */
+export async function requireAdmin() {
+    const session = await requireAuth();
+
+    if (session.user.role !== 'ADMIN') {
+        throw new Error('Admin access required');
+    }
+    return session;
+}
+
+/**
+ * Check if user has tenant or admin role
+ */
+export async function requireTenant() {
+    const session = await requireAuth();
+    if (session.user.role !== 'TENANT' && session.user.role !== 'ADMIN') {
+        throw new Error('Tenant access required');
+    }
+    return session;
+}

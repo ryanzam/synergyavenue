@@ -4,7 +4,7 @@ import { applications, rooms, users } from '@/data'
 import { ArrowRight, Bell, Building2, DollarSign, FileText, Plus, Settings, TrendingUp, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { requireAdmin } from '@/lib/auth'
+import { requireAdmin } from '@/actions/auth'
 
 const stats = {
     totalRooms: rooms.length,

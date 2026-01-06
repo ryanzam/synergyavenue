@@ -11,7 +11,6 @@ import { useFormStatus } from 'react-dom';
 import { createRoom, updateRoom } from '@/actions/rooms';
 import { toast } from 'sonner';
 import Image from 'next/image';
-
 interface RoomFormClientProps {
     room?: {
         id: string;
@@ -20,13 +19,10 @@ interface RoomFormClientProps {
         sizeSqFt: number;
         monthlyRent: number;
         deposit: number;
-        amenities: string[];
-        photos: string[];
+        photo: string;
         status: string;
     };
 }
-
-type LocalActionState = { success?: boolean; error?: string } | null;
 
 const SubmitButton = ({ isEdit }: { isEdit: boolean }) => {
     const { pending } = useFormStatus();
@@ -38,15 +34,14 @@ const SubmitButton = ({ isEdit }: { isEdit: boolean }) => {
     );
 }
 
-
 const RoomForm = ({ room }: RoomFormClientProps) => {
 
     const router = useRouter();
-    const [photos, setPhotos] = useState<string[]>(room?.photos || []);
+    const [photos, setPhotos] = useState<string>(room?.photo || "");
     const [uploading, setUploading] = useState(false);
 
     const action = room ? updateRoom : createRoom;
-    const [state, formAction] = useActionState(action as any, null) as [LocalActionState, any, boolean];
+    const [state, formAction] = useActionState(action, null);
 
     useEffect(() => {
         if (state?.success) {
@@ -61,18 +56,11 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        setUploading(true);
-
-        const newPhotos = Array.from(files).map(file => URL.createObjectURL(file));
-        setPhotos(prev => [...prev, ...newPhotos]);
-
-        setUploading(false);
-
         toast.success('Photos uploaded');
     };
 
     const removePhoto = (index: number) => {
-        setPhotos(prev => prev.filter((_, i) => i !== index));
+        setPhotos("");
     };
 
     return (
@@ -82,27 +70,28 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
             {/* Basic Information */}
             <Card>
                 <CardHeader>
-                    <CardTitle className='text-primary'>Basic Information</CardTitle>
-                    <CardDescription className='text-primary'>Enter the room details</CardDescription>
+                    <CardTitle>Basic Information</CardTitle>
+                    <CardDescription>Enter the room details</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div>
-                        <Label htmlFor="name" className='text-primary'>Room Name *</Label>
+                        <Label htmlFor="name">Room Name *</Label>
                         <Input
                             id="name"
                             name="name"
-                            defaultValue={room?.name}
+                            value={room?.name}
                             placeholder="e.g., Room 1, Corner Shop Space"
                             required
                         />
                     </div>
 
                     <div>
-                        <Label htmlFor="description" className='text-primary'>Description *</Label>
+                        <Label htmlFor="description">Description *</Label>
                         <Textarea
                             id="description"
                             name="description"
-                            defaultValue={room?.description}
+                            value={room?.description}
+                            minLength={10}
                             placeholder="Describe the room, its features, and ideal use cases..."
                             rows={4}
                             required
@@ -111,12 +100,12 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <Label htmlFor="sizeSqFt" className='text-primary'>Size (sq ft) *</Label>
+                            <Label htmlFor="sizeSqFt">Size (sq ft) *</Label>
                             <Input
                                 id="sizeSqFt"
                                 name="sizeSqFt"
                                 type="number"
-                                defaultValue={room?.sizeSqFt}
+                                value={room?.sizeSqFt}
                                 placeholder="e.g., 250"
                                 required
                                 min="1"
@@ -124,12 +113,12 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                         </div>
 
                         <div>
-                            <Label htmlFor="monthlyRent" className='text-primary'>Monthly Rent ($) *</Label>
+                            <Label htmlFor="monthlyRent">Monthly Rent ($) *</Label>
                             <Input
                                 id="monthlyRent"
                                 name="monthlyRent"
                                 type="number"
-                                defaultValue={room?.monthlyRent}
+                                value={room?.monthlyRent}
                                 placeholder="e.g., 1500"
                                 required
                                 min="1"
@@ -137,12 +126,12 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                         </div>
 
                         <div>
-                            <Label htmlFor="deposit" className='text-primary'>Security Deposit ($) *</Label>
+                            <Label htmlFor="deposit">Security Deposit ($) *</Label>
                             <Input
                                 id="deposit"
                                 name="deposit"
                                 type="number"
-                                defaultValue={room?.deposit}
+                                value={room?.deposit}
                                 placeholder="e.g., 1500"
                                 required
                                 min="0"
@@ -151,82 +140,25 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                     </div>
 
                     <div>
-                        <Label htmlFor="status" className='text-primary'>Status *</Label>
-                        <select className='border ml-2 p-2 rounded-md' name="status" defaultValue={room?.status || 'AVAILABLE'}>
-                            <option value="AVAILABLE">Available</option>
-                            <option value="OCCUPIED">Occupied</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="MAINTENANCE">Maintenance</option>
-                        </select>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Photos */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className='text-primary'>Photos</CardTitle>
-                    <CardDescription className='text-primary'>Upload room photos</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <Label
-                            htmlFor="photo-upload"
-                            className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors"
-                        >
-                            <div className="text-center">
-                                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                                <span className="text-sm text-gray-600">
-                                    {uploading ? 'Uploading...' : 'Click to upload photos'}
-                                </span>
-                            </div>
-                        </Label>
-                        <Input
-                            id="photo-upload"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={handlePhotoUpload}
-                            disabled={uploading}
-                        />
-                    </div>
-
-                    {photos.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            {photos.map((photo, index) => (
-                                <div key={index} className="relative group">
-                                    <div className="relative h-32 bg-gray-100 rounded-lg overflow-hidden">
-                                        <Image
-                                            src={photo}
-                                            alt={`Room photo ${index + 1}`}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="sm"
-                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={() => removePhoto(index)}
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                    {index === 0 && (
-                                        <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                                            Cover
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                        <div>
+                            <Label htmlFor="status">Status *</Label>
+                            <select name="status" id="" className='border p-2 ml-2'>
+                                <option value="AVAILABLE">Available</option>
+                                <option value="OCCUPIED">Occupied</option>
+                                <option value="PENDING">Pending</option>
+                                <option value="MAINTENANCE">Maintenance</option>
+                            </select>
                         </div>
-                    )}
-                    <input
-                        type="hidden"
-                        name="photos"
-                        value={JSON.stringify(photos)}
-                    />
+                        <div>
+                            <Label htmlFor="photo">Photo Url</Label>
+                            <Input
+                                id="photo"
+                                name="photo"
+                                value={room?.photo}
+                                placeholder="https://roomimage.com"
+                            />
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 

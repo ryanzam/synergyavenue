@@ -40,21 +40,19 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
                         {/* Photo Carousel */}
                         <Carousel className="w-full" opts={{ loop: true }}>
                             <CarouselContent>
-                                {room?.photos.map((p, index) => (
-                                    <CarouselItem key={index}>
-                                        <div className="p-1">
-                                            <Card>
-                                                <CardContent className="flex aspect-square items-center justify-center p-6">
-                                                    <Image
-                                                        src={p}
-                                                        alt={room?.name}
-                                                        fill
-                                                    />
-                                                </CardContent>
-                                            </Card>
-                                        </div>
-                                    </CarouselItem>
-                                ))}
+                                <CarouselItem key={room?.id}>
+                                    <div className="p-1">
+                                        <Card>
+                                            <CardContent className="flex aspect-square items-center justify-center p-6">
+                                                <Image
+                                                    src={room?.photo || '/placeholder-image.png'}
+                                                    alt={room?.name || 'Room image'}
+                                                    fill
+                                                />
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                </CarouselItem>
                             </CarouselContent>
                         </Carousel>
 

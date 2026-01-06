@@ -1,7 +1,8 @@
+"use server"
+
 import z from "zod";
 import prisma from "@/lib/prisma";
-import { RoomStatus } from "@/enums";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "./auth";
 
 const roomSchema = z.object({
     name: z.string().min(2, 'Room name must be at least 2 characters'),
@@ -10,7 +11,8 @@ const roomSchema = z.object({
     monthlyRent: z.number().positive('Monthly rent must be a positive number'),
     deposit: z.number().positive('Deposit must be a positive number'),
     status: z.enum(['AVAILABLE', 'PENDING', 'OCCUPIED', 'MAINTENANCE']).default('AVAILABLE'),
-    photos: z.array(z.string().url()).default([])
+    photo: z.string().url(),
+    currentTenantId: z.string().optional()
 });
 
 const updateRoomSchema = roomSchema.partial().extend({
@@ -18,21 +20,35 @@ const updateRoomSchema = roomSchema.partial().extend({
 });
 
 // types
-type UpdateData = { success: boolean; error: string; room?: undefined; message?: undefined; }
-    | { success: boolean; room: z.infer<typeof roomSchema>; message: string; error?: undefined; }
+type UpdateData = { success?: boolean; error?: string; room?: undefined; message?: undefined; }
+    | { success?: boolean; room: z.infer<typeof roomSchema>; message?: string; error?: undefined; }
     | null
 
-type CreateData = { name: string; description: string; sizeSqFt: number; monthlyRent: number; deposit: number; status: RoomStatus; photos: string[] } | z.infer<typeof roomSchema>;
+type CreateData = { success?: boolean; error?: string; room?: any; message?: undefined; }
+    | { success?: boolean; room: z.infer<typeof roomSchema>; message?: string; error?: undefined; }
+    | null
 
 // ============================================================================
 // SERVER ACTIONS
 // ============================================================================
 
-export async function createRoom(data: CreateData) {
+export async function createRoom(prevState: any, formData: FormData) {
     try {
-        await requireAdmin()
+        const { user } = await requireAdmin()
+
+        const data = {
+            name: formData.get('name') as string,
+            description: formData.get('description') as string,
+            sizeSqFt: Number(formData.get('sizeSqFt')),
+            monthlyRent: Number(formData.get('monthlyRent')),
+            deposit: Number(formData.get('deposit')),
+            status: formData.get('status'),
+            photo: formData.get('photo') ? formData.get('photo') as string : undefined
+        };
 
         const validatedData = roomSchema.parse(data);
+
+        console.log({ validatedData, data })
 
         const room = await prisma.room.create({
             data: {
@@ -41,10 +57,12 @@ export async function createRoom(data: CreateData) {
                 sizeSqFt: validatedData.sizeSqFt,
                 monthlyRent: validatedData.monthlyRent,
                 deposit: validatedData.deposit,
-                photos: validatedData.photos,
+                photo: validatedData.photo,
                 status: validatedData.status,
+                createdAt: new Date(),
+                currentTenantId: user.id
             },
-        });
+        })
 
         return {
             success: true,
@@ -70,9 +88,20 @@ export async function createRoom(data: CreateData) {
     }
 }
 
-export async function updateRoom(data: UpdateData) {
+export async function updateRoom(prevState: any, formData: FormData) {
     try {
         await requireAdmin();
+
+        const data = {
+            id: formData.get('id') as string,
+            name: formData.get('name') as string,
+            description: formData.get('description') as string,
+            sizeSqFt: Number(formData.get('sizeSqFt')),
+            monthlyRent: Number(formData.get('monthlyRent')),
+            deposit: Number(formData.get('deposit')),
+            status: formData.get('status'),
+            photo: formData.get('photo') ? formData.get('photo') as string : undefined
+        };
 
         const validatedData = updateRoomSchema.parse(data);
         const { id, ...updateData } = validatedData;
@@ -299,7 +328,7 @@ export async function updateRoomStatus(
     }
 }
 
-export async function addRoomPhotos(roomId: string, photoUrls: string[]) {
+export async function addRoomPhotos(roomId: string, photoUrl: string) {
     try {
         await requireAdmin();
 
@@ -317,7 +346,7 @@ export async function addRoomPhotos(roomId: string, photoUrls: string[]) {
         const updatedRoom = await prisma.room.update({
             where: { id: roomId },
             data: {
-                photos: [...room.photos, ...photoUrls],
+                photo: photoUrl,
             },
         });
 
@@ -354,7 +383,7 @@ export async function removeRoomPhoto(roomId: string, photoUrl: string) {
         const updatedRoom = await prisma.room.update({
             where: { id: roomId },
             data: {
-                photos: room.photos.filter(p => p !== photoUrl),
+                photo: room.photo,
             },
         });
 

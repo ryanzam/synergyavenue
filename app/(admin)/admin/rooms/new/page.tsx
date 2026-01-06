@@ -1,21 +1,12 @@
-import { getCurrentSession } from '@/actions/auth';
+import { requireAdmin } from '@/actions/auth';
 import RoomForm from '@/components/room/room-form';
 import { Button } from '@/components/ui/button';
 import { Building2 } from 'lucide-react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
 const AdminRoomNewPage = async () => {
 
-    const session = await getCurrentSession()
-
-    if (!session.user?.email) {
-        redirect("/dashboard")
-    }
-
-    if (session.user?.role !== 'ADMIN') {
-        redirect("/dashboard")
-    }
+    const session = await requireAdmin()
 
     return (
         <div className="min-h-screen bg-gray-50">

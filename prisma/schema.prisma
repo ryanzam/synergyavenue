@@ -125,7 +125,7 @@ model Room {
   sizeSqFt    Int // Size in square feet
   monthlyRent Int // Monthly rent amount
   deposit     Int // Security deposit amount
-  photos      String[] // Array of image URLs
+  photo       String // Image URL
   status      RoomStatus @default(AVAILABLE)
 
   // Current tenant relation (optional)

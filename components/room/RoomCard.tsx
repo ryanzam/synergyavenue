@@ -18,7 +18,7 @@ const RoomCard = ({ room }: RoomCardProps) => {
             {/* Room Image */}
             <div className="relative h-56 w-full overflow-hidden bg-gray-200">
                 <Image
-                    src={room.photos.length === 0 ? '/placeholder-room.jpg' : room.photos[0]}
+                    src={room.photo ? '/placeholder-room.jpg' : room.photo}
                     alt={room.name}
                     fill
                     className="object-cover"
