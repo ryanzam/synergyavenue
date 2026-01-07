@@ -2,6 +2,7 @@ import { requireAdmin } from '@/actions/auth';
 import RoomForm from '@/components/room/room-form';
 import { Button } from '@/components/ui/button';
 import { Building2 } from 'lucide-react';
+import { redirect } from 'next/navigation'
 import Link from 'next/link';
 
 const AdminRoomNewPage = async () => {

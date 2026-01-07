@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/actions/auth'
-import { getRooms } from '@/actions/rooms'
+import { deleteRoom, getRooms } from '@/actions/rooms'
 import Loading from '@/components/loading/Loading'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,12 +9,19 @@ import Link from 'next/link'
 import Image from 'next/image'
 import RoomStatusBadge from '@/components/room/room-status-badge'
 import { RoomStatus } from '@/enums'
+import RoomDeleteBtn from '@/components/room/room-delete-btn'
 
-const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string; search?: string } }) => {
+const AdminRoomPage = async ({
+    searchParams
+}: {
+    searchParams: Promise<{ status?: string; search?: string }>
+}) => {
 
     await requireAdmin()
 
-    const { success, rooms } = await getRooms({});
+    const { search, status } = await searchParams
+
+    const { success, rooms } = await getRooms({ status });
 
     if (!success) return <Loading />
 
@@ -26,8 +33,6 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
         maintenance: rooms ? rooms.filter(r => r.status === 'MAINTENANCE').length : null,
     };
 
-    console.log(rooms)
-
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -35,7 +40,8 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
                 <div className="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Button variant="outline" size="sm" className='hover:text-white'>
+                            <Button variant="outline" size="sm"
+                                className='hover:text-white'>
                                 <Link href="/admin">← </Link>
                             </Button>
                             <div className="h-6 w-px bg-gray-300" />
@@ -45,7 +51,9 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
                             </div>
                         </div>
 
-                        <Button asChild>
+                        <Button
+                            asChild
+                            className='hover:text-white'>
                             <Link href="/admin/rooms/new">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add New Room
@@ -99,44 +107,49 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
                                 <Input
                                     type="text"
                                     placeholder="Search rooms..."
-                                    defaultValue={searchParams.search}
+                                    //defaultValue={searchParams}
                                     className="pl-10"
                                     name="search"
                                 />
                             </div>
                             <div className="flex gap-2 flex-wrap">
                                 <Button
-                                    variant={!searchParams.status || searchParams.status === 'ALL' ? 'default' : 'outline'}
+                                    variant={!status || status === 'ALL' ? 'default' : 'outline'}
                                     size="sm"
                                     asChild
+                                    className='hover:text-white'
                                 >
                                     <Link href="/admin/rooms?status=ALL">All</Link>
                                 </Button>
                                 <Button
-                                    variant={searchParams.status === 'AVAILABLE' ? 'default' : 'outline'}
+                                    variant={status === 'AVAILABLE' ? 'default' : 'outline'}
                                     size="sm"
                                     asChild
+                                    className='hover:text-white'
                                 >
                                     <Link href="/admin/rooms?status=AVAILABLE">Available</Link>
                                 </Button>
                                 <Button
-                                    variant={searchParams.status === 'OCCUPIED' ? 'default' : 'outline'}
+                                    variant={status === 'OCCUPIED' ? 'default' : 'outline'}
                                     size="sm"
                                     asChild
+                                    className='hover:text-white'
                                 >
                                     <Link href="/admin/rooms?status=OCCUPIED">Occupied</Link>
                                 </Button>
                                 <Button
-                                    variant={searchParams.status === 'PENDING' ? 'default' : 'outline'}
+                                    variant={status === 'PENDING' ? 'default' : 'outline'}
                                     size="sm"
                                     asChild
+                                    className='hover:text-white'
                                 >
                                     <Link href="/admin/rooms?status=PENDING">Pending</Link>
                                 </Button>
                                 <Button
-                                    variant={searchParams.status === 'MAINTENANCE' ? 'default' : 'outline'}
+                                    variant={status === 'MAINTENANCE' ? 'default' : 'outline'}
                                     size="sm"
                                     asChild
+                                    className='hover:text-white'
                                 >
                                     <Link href="/admin/rooms?status=MAINTENANCE">Maintenance</Link>
                                 </Button>
@@ -152,11 +165,12 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
                             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">No rooms found</h3>
                             <p className="text-gray-600 mb-4">
-                                {searchParams.search || searchParams.status
+                                {search || status
                                     ? 'Try adjusting your filters'
                                     : 'Get started by adding your first room'}
                             </p>
-                            <Button asChild>
+                            asChild<Button
+                                className='hover:text-white'>
                                 <Link href="/admin/rooms/new">
                                     <Plus className="mr-2 h-4 w-4" />
                                     Add New Room
@@ -224,20 +238,20 @@ const AdminRoomPage = async ({ searchParams }: { searchParams: { status?: string
                                     </div>
 
                                     <div className="flex gap-2">
-                                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                                        <Button variant="outline" size="sm" className="flex-1 hover:text-white" asChild>
                                             <Link href={`/rooms/${room.id}`}>
                                                 <Eye className="h-4 w-4 mr-2" />
                                                 View
                                             </Link>
                                         </Button>
-                                        <Button variant="outline" size="sm" className="flex-1" asChild>
+                                        <Button variant="outline" size="sm" className="flex-1 hover:text-white" asChild>
                                             <Link href={`/admin/rooms/${room.id}/edit`}>
                                                 <Edit className="h-4 w-4 mr-2" />
                                                 Edit
                                             </Link>
                                         </Button>
 
-                                        <Button variant="destructive">Delete</Button>
+                                        <RoomDeleteBtn roomId={room.id} roomName={room.name} />
                                     </div>
                                 </CardContent>
                             </Card>

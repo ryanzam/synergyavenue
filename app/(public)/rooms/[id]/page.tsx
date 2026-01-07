@@ -27,7 +27,7 @@ const RoomDetailPage = async ({ params }: { params: Promise<{ id: string }>; }) 
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
                     <Button variant="outline" asChild className='hover:bg-primary/20'>
-                        <Link href="/">
+                        <Link href="/admin/rooms">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Listings
                         </Link>

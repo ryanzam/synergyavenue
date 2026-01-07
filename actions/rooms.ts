@@ -3,6 +3,7 @@
 import z from "zod";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "./auth";
+import { generateMockId } from "@/data";
 
 const roomSchema = z.object({
     name: z.string().min(2, 'Room name must be at least 2 characters'),
@@ -19,15 +20,6 @@ const updateRoomSchema = roomSchema.partial().extend({
     id: z.string().min(1),
 });
 
-// types
-type UpdateData = { success?: boolean; error?: string; room?: undefined; message?: undefined; }
-    | { success?: boolean; room: z.infer<typeof roomSchema>; message?: string; error?: undefined; }
-    | null
-
-type CreateData = { success?: boolean; error?: string; room?: any; message?: undefined; }
-    | { success?: boolean; room: z.infer<typeof roomSchema>; message?: string; error?: undefined; }
-    | null
-
 // ============================================================================
 // SERVER ACTIONS
 // ============================================================================
@@ -35,6 +27,8 @@ type CreateData = { success?: boolean; error?: string; room?: any; message?: und
 export async function createRoom(prevState: any, formData: FormData) {
     try {
         const { user } = await requireAdmin()
+
+        console.log({ user })
 
         const data = {
             name: formData.get('name') as string,
@@ -48,8 +42,6 @@ export async function createRoom(prevState: any, formData: FormData) {
 
         const validatedData = roomSchema.parse(data);
 
-        console.log({ validatedData, data })
-
         const room = await prisma.room.create({
             data: {
                 name: validatedData.name,
@@ -60,7 +52,7 @@ export async function createRoom(prevState: any, formData: FormData) {
                 photo: validatedData.photo,
                 status: validatedData.status,
                 createdAt: new Date(),
-                currentTenantId: user.id
+                currentTenantId: generateMockId()
             },
         })
 
@@ -210,8 +202,12 @@ export async function getRooms(filters?: {
     try {
         const where: any = {};
 
-        if (filters?.status) {
-            where.status = filters.status;
+        if (filters?.status === "ALL") {
+            where.status = {}
+        }
+
+        if (filters?.status !== "ALL") {
+            where.status = filters?.status;
         }
 
         if (filters?.minRent || filters?.maxRent) {
