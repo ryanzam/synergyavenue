@@ -1,0 +1,44 @@
+import { requireAdmin } from '@/actions/auth';
+import { getRoom } from '@/actions/rooms';
+import Loading from '@/components/loading/Loading';
+import RoomForm from '@/components/room/room-form';
+import { Button } from '@/components/ui/button';
+import { Building2 } from 'lucide-react';
+import Link from 'next/link';
+
+const AdminRoomEditPage = async ({ params }: { params: Promise<{ roomId: string }>; }) => {
+
+    await requireAdmin()
+
+    const { roomId } = await params;
+
+    const { success, room } = await getRoom(roomId);
+
+    if (!success && !room) return <Loading />
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <header className="bg-white border-b sticky top-0 z-10">
+                <div className="container mx-auto px-4 py-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="sm" asChild className='hover:text-white'>
+                            <Link href="/admin/rooms">←</Link>
+                        </Button>
+                        <div className="h-6 w-px bg-gray-300" />
+                        <div className="flex items-center gap-2">
+                            <Building2 className="h-5 w-5 text-blue-600" />
+                            <h1 className="text-[16px] font-bold text-gray-900">Edit Room: {room?.name}</h1>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-4xl">
+                <RoomForm room={room} />
+            </div>
+        </div>
+    )
+}
+
+export default AdminRoomEditPage

@@ -169,7 +169,8 @@ const AdminRoomPage = async ({
                                     ? 'Try adjusting your filters'
                                     : 'Get started by adding your first room'}
                             </p>
-                            asChild<Button
+                            <Button
+                                asChild
                                 className='hover:text-white'>
                                 <Link href="/admin/rooms/new">
                                     <Plus className="mr-2 h-4 w-4" />
@@ -245,7 +246,7 @@ const AdminRoomPage = async ({
                                             </Link>
                                         </Button>
                                         <Button variant="outline" size="sm" className="flex-1 hover:text-white" asChild>
-                                            <Link href={`/admin/rooms/${room.id}/edit`}>
+                                            <Link href={`/admin/rooms/edit/${room.id}`}>
                                                 <Edit className="h-4 w-4 mr-2" />
                                                 Edit
                                             </Link>

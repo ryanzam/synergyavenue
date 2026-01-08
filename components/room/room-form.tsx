@@ -1,8 +1,7 @@
 "use client"
 import { Label } from '@radix-ui/react-label';
-import { Upload, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useActionState, useEffect, useState, useMemo } from 'react'
+import { useActionState, useEffect } from 'react'
 import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card';
 import { Input } from '../ui/input';
@@ -10,7 +9,6 @@ import { Textarea } from '../ui/textarea';
 import { useFormStatus } from 'react-dom';
 import { createRoom, updateRoom } from '@/actions/rooms';
 import { toast } from 'sonner';
-import Image from 'next/image';
 interface RoomFormClientProps {
     room?: {
         id: string;
@@ -37,8 +35,6 @@ const SubmitButton = ({ isEdit }: { isEdit: boolean }) => {
 const RoomForm = ({ room }: RoomFormClientProps) => {
 
     const router = useRouter();
-    const [photos, setPhotos] = useState<string>(room?.photo || "");
-    const [uploading, setUploading] = useState(false);
 
     const action = room ? updateRoom : createRoom;
     const [state, formAction] = useActionState(action, null);
@@ -51,17 +47,6 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
             toast.error("Error saving room.")
         }
     }, [state, router, toast, room]);
-
-    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
-        toast.success('Photos uploaded');
-    };
-
-    const removePhoto = (index: number) => {
-        setPhotos("");
-    };
 
     return (
         <form action={formAction} className="space-y-6">
@@ -79,7 +64,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                         <Input
                             id="name"
                             name="name"
-                            value={room?.name}
+                            defaultValue={room?.name}
                             placeholder="e.g., Room 1, Corner Shop Space"
                             required
                         />
@@ -90,7 +75,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                         <Textarea
                             id="description"
                             name="description"
-                            value={room?.description}
+                            defaultValue={room?.description}
                             minLength={10}
                             placeholder="Describe the room, its features, and ideal use cases..."
                             rows={4}
@@ -105,7 +90,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                                 id="sizeSqFt"
                                 name="sizeSqFt"
                                 type="number"
-                                value={room?.sizeSqFt}
+                                defaultValue={room?.sizeSqFt}
                                 placeholder="e.g., 250"
                                 required
                                 min="1"
@@ -118,7 +103,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                                 id="monthlyRent"
                                 name="monthlyRent"
                                 type="number"
-                                value={room?.monthlyRent}
+                                defaultValue={room?.monthlyRent}
                                 placeholder="e.g., 1500"
                                 required
                                 min="1"
@@ -131,7 +116,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                                 id="deposit"
                                 name="deposit"
                                 type="number"
-                                value={room?.deposit}
+                                defaultValue={room?.deposit}
                                 placeholder="e.g., 1500"
                                 required
                                 min="0"
@@ -142,7 +127,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                     <div>
                         <div>
                             <Label htmlFor="status">Status *</Label>
-                            <select name="status" id="" className='border p-2 ml-2'>
+                            <select defaultValue={room?.status} name="status" id="" className='border p-2 ml-2'>
                                 <option value="AVAILABLE">Available</option>
                                 <option value="OCCUPIED">Occupied</option>
                                 <option value="PENDING">Pending</option>
@@ -154,7 +139,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                             <Input
                                 id="photo"
                                 name="photo"
-                                value={room?.photo}
+                                defaultValue={room?.photo}
                                 placeholder="https://roomimage.com"
                             />
                         </div>
@@ -167,6 +152,7 @@ const RoomForm = ({ room }: RoomFormClientProps) => {
                 <Button
                     type="button"
                     variant="outline"
+                    className='hover:text-white'
                     onClick={() => router.back()}
                 >
                     Cancel
