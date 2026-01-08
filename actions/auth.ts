@@ -318,8 +318,12 @@ export async function getAllUsers(filters?: {
 
         const where: any = {};
 
-        if (filters?.role) {
-            where.role = filters.role;
+        if (filters?.role === "ALL") {
+            where.role = {}
+        }
+
+        if (filters?.role !== "ALL") {
+            where.role = filters?.role
         }
 
         if (filters?.search) {
